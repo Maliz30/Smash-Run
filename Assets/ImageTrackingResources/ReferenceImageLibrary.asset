@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: ReferenceImageLibrary
+  m_EditorClassIdentifier: Unity.XR.ARSubsystems::UnityEngine.XR.ARSubsystems.XRReferenceImageLibrary
+  m_GuidLow: 5385865851084288395
+  m_GuidHigh: 10631608207839987642
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 4920587878019992896
+      m_GuidHigh: 102944524894713482
+    m_SerializedTextureGuid:
+      m_GuidLow: 13660714940256467123
+      m_GuidHigh: 3758443460497502857
+    m_Size: {x: 0.047, y: 0.047}
+    m_SpecifySize: 1
+    m_Name: QR_Vermelho
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4986911487107387253
+      m_GuidHigh: 8534964898713896597
+    m_SerializedTextureGuid:
+      m_GuidLow: 13575049710763921941
+      m_GuidHigh: 15448823061187610010
+    m_Size: {x: 0.047, y: 0.047}
+    m_SpecifySize: 1
+    m_Name: QR_Azul
+    m_Texture: {fileID: 0}
