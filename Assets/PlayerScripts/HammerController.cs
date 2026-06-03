@@ -330,19 +330,7 @@ public class HammerController : MonoBehaviour
             return;
         }
 
-        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-
-        if (playerHealth == null)
-        {
-            playerHealth = other.GetComponentInParent<PlayerHealth>();
-        }
-
-        if (playerHealth == null)
-        {
-            return;
-        }
-
-        playerHealth.TakeDamage(attackDamage);
+        // TODO: apply damage via PlayerHealth when that system is ready.
         hasAppliedDamageThisAttack = true;
         TransitionTo(HammerState.Recovering);
     }
