@@ -24,6 +24,14 @@ public class HammerController : MonoBehaviour
     [SerializeField] private float maxHeight = 8f;
     [SerializeField] private float defaultHeight = 4f;
 
+    [Header("Boundaries")]
+    [SerializeField] private bool limitX = false;
+    [SerializeField] private float minX = -5f;
+    [SerializeField] private float maxX = 5f;
+    [SerializeField] private bool limitZ = false;
+    [SerializeField] private float minZ = -5f;
+    [SerializeField] private float maxZ = 5f;
+
     [Header("Swing Rotation")]
     [SerializeField] private Vector3 headLocalDirection = Vector3.forward;
     [Tooltip("How many degrees to tilt the head back during wind-up.")]
@@ -213,6 +221,16 @@ public class HammerController : MonoBehaviour
             minHeight,
             maxHeight
         );
+
+        if (limitX)
+        {
+            nextPosition.x = Mathf.Clamp(nextPosition.x, minX, maxX);
+        }
+
+        if (limitZ)
+        {
+            nextPosition.z = Mathf.Clamp(nextPosition.z, minZ, maxZ);
+        }
 
         MoveToPosition(nextPosition);
 

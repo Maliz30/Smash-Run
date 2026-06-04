@@ -4,6 +4,19 @@ using UnityEngine.InputSystem;
 [DisallowMultipleComponent]
 public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
 {
+    [Header("Movement Keys")]
+    [SerializeField] private Key forwardKey = Key.I;
+    [SerializeField] private Key backKey = Key.K;
+    [SerializeField] private Key leftKey = Key.J;
+    [SerializeField] private Key rightKey = Key.L;
+
+    [Header("Height Keys")]
+    [SerializeField] private Key upKey = Key.U;
+    [SerializeField] private Key downKey = Key.O;
+
+    [Header("Attack Keys")]
+    [SerializeField] private Key attackKey = Key.P;
+
     public Vector3 GetMovementInput()
     {
         Keyboard keyboard = Keyboard.current;
@@ -16,22 +29,22 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
         float x = 0f;
         float z = 0f;
 
-        if (keyboard.jKey.isPressed)
+        if (keyboard[leftKey].isPressed)
         {
             x -= 1f;
         }
 
-        if (keyboard.lKey.isPressed)
+        if (keyboard[rightKey].isPressed)
         {
             x += 1f;
         }
 
-        if (keyboard.iKey.isPressed)
+        if (keyboard[forwardKey].isPressed)
         {
             z += 1f;
         }
 
-        if (keyboard.kKey.isPressed)
+        if (keyboard[backKey].isPressed)
         {
             z -= 1f;
         }
@@ -57,12 +70,12 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
 
         float y = 0f;
 
-        if (keyboard.uKey.isPressed)
+        if (keyboard[upKey].isPressed)
         {
             y += 1f;
         }
 
-        if (keyboard.oKey.isPressed)
+        if (keyboard[downKey].isPressed)
         {
             y -= 1f;
         }
@@ -73,6 +86,6 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
     public bool GetAttackTrigger()
     {
         Keyboard keyboard = Keyboard.current;
-        return keyboard != null && keyboard.pKey.wasPressedThisFrame;
+        return keyboard != null && keyboard[attackKey].wasPressedThisFrame;
     }
 }
