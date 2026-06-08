@@ -18,14 +18,13 @@ public class PhysicsMovement : MonoBehaviour
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 3200f;
     [SerializeField] private float dashDuration = 0.15f;
-    [SerializeField] private float dashCooldown = 0.75f;
 
     private Rigidbody rb;
     private Collider col;
     private PlayerInputHandler inputHandler;
+    private PlayerDashCharges dashCharges;
 
     private float dashTimeRemaining;
-    private float dashCooldownRemaining;
     private Vector3 dashDirection;
 
     private void Awake()
@@ -33,6 +32,7 @@ public class PhysicsMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         inputHandler = GetComponent<PlayerInputHandler>();
+        dashCharges = GetComponent<PlayerDashCharges>();
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationZ;
@@ -59,11 +59,6 @@ public class PhysicsMovement : MonoBehaviour
         {
             MoveCube();
             ApplyCustomFriction();
-        }
-
-        if (dashCooldownRemaining > 0f)
-        {
-            dashCooldownRemaining -= Time.fixedDeltaTime;
         }
     }
 
@@ -138,14 +133,13 @@ public class PhysicsMovement : MonoBehaviour
 
     private void TryDash()
     {
-        if (dashCooldownRemaining > 0f)
+        if (dashCharges == null || !dashCharges.TryConsumeCharge())
         {
             return;
         }
 
         dashDirection = GetDashDirection();
         dashTimeRemaining = dashDuration;
-        dashCooldownRemaining = dashCooldown;
     }
 
     private void ApplyDashVelocity()
