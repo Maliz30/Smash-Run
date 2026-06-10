@@ -22,6 +22,7 @@ public class MockPoseDriver : MonoBehaviour
     [Header("Input")]
     [SerializeField] private bool requireMouseOver = true;
     [SerializeField] private Key keyboardFallbackKey = Key.B;
+    [SerializeField] private Camera raycastCamera;
 
     private Collider targetCollider;
     private Vector3 restLocalPosition;
@@ -106,7 +107,9 @@ public class MockPoseDriver : MonoBehaviour
             return false;
         }
 
-        Camera targetCamera = Camera.main;
+        Camera targetCamera = raycastCamera;
+        if (targetCamera == null)
+            targetCamera = Camera.main;
 
         if (targetCamera == null)
         {
