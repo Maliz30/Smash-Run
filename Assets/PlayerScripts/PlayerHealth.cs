@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // Necessário para mexer no TextMeshPro da interface
+using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,10 +8,9 @@ public class PlayerHealth : MonoBehaviour
     private int vidasRestantes;
 
     [Header("Interface (UI)")]
-    [SerializeField] private TextMeshProUGUI textoVidas; // Arraste o seu texto da tela aqui
-
+    [SerializeField] private TextMeshProUGUI textoVidas; 
     [Header("Áudio de Dano")]
-    [SerializeField] private AudioClip painSound; // Arraste o .mp3 do grito aqui
+    [SerializeField] private AudioClip painSound; 
     private AudioSource audioSource;
 
     private void Awake()
@@ -25,12 +24,11 @@ public class PlayerHealth : MonoBehaviour
         AtualizarTextoInterface();
     }
 
-    // Essa é a função que o HammerController vai chamar ao detectar o impacto
     public void TakeDamage(int damage)
     {
         if (vidasRestantes <= 0) return;
 
-        vidasRestantes -= 1; // Perde 1 vida por martelada
+        vidasRestantes -= 1; 
         AtualizarTextoInterface();
 
         if (audioSource != null && painSound != null)
@@ -60,6 +58,6 @@ public class PlayerHealth : MonoBehaviour
         {
             textoVidas.text = "GAME OVER!";
         }
-        Debug.Log("O Player do teclado perdeu todas as vidas! Vitória do VR!");
+        Debug.Log("Você Perdeu!");
     }
 }
