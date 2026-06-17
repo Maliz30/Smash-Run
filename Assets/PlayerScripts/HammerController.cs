@@ -348,6 +348,12 @@ public class HammerController : MonoBehaviour
             return;
         }
         Debug.Log("Player entrou na área do martelo!");
+        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+        
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(1); // Manda o sinal para o Player tirar vida e tocar o áudio
+        }
         // TODO: apply damage via PlayerHealth when that system is ready.
         hasAppliedDamageThisAttack = true;
         TransitionTo(HammerState.Recovering);
