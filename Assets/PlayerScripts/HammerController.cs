@@ -347,7 +347,7 @@ public class HammerController : MonoBehaviour
         {
             return;
         }
-
+        Debug.Log("Player entrou na área do martelo!");
         // TODO: apply damage via PlayerHealth when that system is ready.
         hasAppliedDamageThisAttack = true;
         TransitionTo(HammerState.Recovering);
