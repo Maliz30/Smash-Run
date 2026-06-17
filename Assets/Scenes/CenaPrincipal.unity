@@ -180,7 +180,7 @@ MonoBehaviour:
   attackDamage: 20
   damageLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 8
 --- !u!135 &104590846
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 522925905}
   - component: {fileID: 522925904}
   - component: {fileID: 522925912}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2142,7 +2142,7 @@ MonoBehaviour:
   attackDamage: 20
   damageLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 8
 --- !u!135 &1232033528
 SphereCollider:
   m_ObjectHideFlags: 0
