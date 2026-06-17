@@ -5504,14 +5504,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Alavanca  (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 3808317302552592644, guid: 1f71367e0afe0144ca29a506dc5f1f13, type: 3}
-      propertyPath: m_Axis.x
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3808317302552592644, guid: 1f71367e0afe0144ca29a506dc5f1f13, type: 3}
-      propertyPath: m_SecondaryAxis.y
-      value: -1
-      objectReference: {fileID: 0}
     - target: {fileID: 4949269599883856323, guid: 1f71367e0afe0144ca29a506dc5f1f13, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.42
