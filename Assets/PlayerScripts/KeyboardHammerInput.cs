@@ -10,9 +10,19 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
     [SerializeField] private Key leftKey = Key.J;
     [SerializeField] private Key rightKey = Key.L;
 
+    [Header("Movement Buttons")]
+    [SerializeField] private DirectionalButton forwardButton;
+    [SerializeField] private DirectionalButton backButton;
+    [SerializeField] private DirectionalButton leftButton;
+    [SerializeField] private DirectionalButton rightButton;
+
     [Header("Height Keys")]
     [SerializeField] private Key upKey = Key.U;
     [SerializeField] private Key downKey = Key.O;
+
+    [Header("Height Buttons")]
+    [SerializeField] private DirectionalButton upButton;
+    [SerializeField] private DirectionalButton downButton;
 
     [Header("Attack Keys")]
     [SerializeField] private Key attackKey = Key.P;
@@ -21,30 +31,45 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
     {
         Keyboard keyboard = Keyboard.current;
 
-        if (keyboard == null)
-        {
-            return Vector3.zero;
-        }
-
         float x = 0f;
         float z = 0f;
 
-        if (keyboard[leftKey].isPressed)
+        if (keyboard != null && keyboard[leftKey].isPressed)
         {
             x -= 1f;
         }
 
-        if (keyboard[rightKey].isPressed)
+        if (keyboard != null && keyboard[rightKey].isPressed)
         {
             x += 1f;
         }
 
-        if (keyboard[forwardKey].isPressed)
+        if (keyboard != null && keyboard[forwardKey].isPressed)
         {
             z += 1f;
         }
 
-        if (keyboard[backKey].isPressed)
+        if (keyboard != null && keyboard[backKey].isPressed)
+        {
+            z -= 1f;
+        }
+
+        if (leftButton != null && leftButton.IsPressed)
+        {
+            x -= 1f;
+        }
+
+        if (rightButton != null && rightButton.IsPressed)
+        {
+            x += 1f;
+        }
+
+        if (forwardButton != null && forwardButton.IsPressed)
+        {
+            z += 1f;
+        }
+
+        if (backButton != null && backButton.IsPressed)
         {
             z -= 1f;
         }
@@ -63,19 +88,24 @@ public class KeyboardHammerInput : MonoBehaviour, IHammerInputProvider
     {
         Keyboard keyboard = Keyboard.current;
 
-        if (keyboard == null)
-        {
-            return 0f;
-        }
-
         float y = 0f;
 
-        if (keyboard[upKey].isPressed)
+        if (keyboard != null && keyboard[upKey].isPressed)
         {
             y += 1f;
         }
 
-        if (keyboard[downKey].isPressed)
+        if (keyboard != null && keyboard[downKey].isPressed)
+        {
+            y -= 1f;
+        }
+
+        if (upButton != null && upButton.IsPressed)
+        {
+            y += 1f;
+        }
+
+        if (downButton != null && downButton.IsPressed)
         {
             y -= 1f;
         }

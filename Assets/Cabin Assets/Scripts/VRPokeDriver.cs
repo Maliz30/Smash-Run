@@ -17,6 +17,7 @@ public class VRPokeDriver : MonoBehaviour
     private Vector3 restLocalPosition;
     private Vector3 pressedLocalPosition;
     private bool isHeld;
+    private float lastValidPressTime = float.NegativeInfinity;
 
     private void Awake()
     {
@@ -28,6 +29,9 @@ public class VRPokeDriver : MonoBehaviour
 
     private void Update()
     {
+        float releaseGraceTime = Mathf.Max(Time.fixedDeltaTime * 1.5f, 0.05f);
+        isHeld = Time.time - lastValidPressTime <= releaseGraceTime;
+
         float speed = isHeld ? pressSpeed : returnSpeed;
         Vector3 target = isHeld ? pressedLocalPosition : restLocalPosition;
         transform.localPosition = Vector3.MoveTowards(transform.localPosition, target, speed * Time.deltaTime);
@@ -35,13 +39,44 @@ public class VRPokeDriver : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Detecta qualquer collider que seja do controle VR
-        // (você pode filtrar por layer se preferir)
-        isHeld = true;
+        TryMarkPress(other);
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerStay(Collider other)
+    {
+        TryMarkPress(other);
+    }
+
+    private void OnDisable()
     {
         isHeld = false;
+        lastValidPressTime = float.NegativeInfinity;
+    }
+
+    private void TryMarkPress(Collider other)
+    {
+        if (other == null || other == col)
+        {
+            return;
+        }
+
+        if (other.transform.IsChildOf(transform.root))
+        {
+            return;
+        }
+
+        if (other.attachedRigidbody == null)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(controllerTag)
+            && controllerTag != "Untagged"
+            && !other.CompareTag(controllerTag))
+        {
+            return;
+        }
+
+        lastValidPressTime = Time.time;
     }
 }

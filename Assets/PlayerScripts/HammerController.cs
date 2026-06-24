@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
@@ -49,7 +50,8 @@ public class HammerController : MonoBehaviour
     [SerializeField] private LayerMask damageLayer = -1;
 
     private Rigidbody rb;
-    private IHammerInputProvider inputProvider;
+    private readonly List<IHammerInputProvider> inputProviders = new();
+    private readonly Dictionary<Object, Vector3> buttonMovementInputs = new();
     private Quaternion initialRotation;
     private Quaternion idleRotationTarget;
     private Quaternion windUpRotation;
@@ -112,15 +114,40 @@ public class HammerController : MonoBehaviour
 
     private void Update()
     {
-        if (inputProvider == null)
+        Vector3 providerMovementInput = Vector3.zero;
+        float providerHeightInput = 0f;
+        bool attackTriggered = false;
+
+        foreach (IHammerInputProvider inputProvider in inputProviders)
         {
-            return;
+            providerMovementInput += inputProvider.GetMovementInput();
+            providerHeightInput += inputProvider.GetHeightInput();
+
+            if (inputProvider.GetAttackTrigger())
+            {
+                attackTriggered = true;
+            }
         }
 
-        cachedMovementInput = inputProvider.GetMovementInput();
-        cachedHeightInput = Mathf.Clamp(inputProvider.GetHeightInput(), -1f, 1f);
+        if (providerMovementInput.sqrMagnitude > 1f)
+        {
+            providerMovementInput.Normalize();
+        }
 
-        if (inputProvider.GetAttackTrigger())
+        foreach (Vector3 buttonMovement in buttonMovementInputs.Values)
+        {
+            providerMovementInput += buttonMovement;
+        }
+
+        if (providerMovementInput.sqrMagnitude > 1f)
+        {
+            providerMovementInput.Normalize();
+        }
+
+        cachedMovementInput = providerMovementInput;
+        cachedHeightInput = Mathf.Clamp(providerHeightInput, -1f, 1f);
+
+        if (attackTriggered)
         {
             attackQueued = true;
         }
@@ -128,11 +155,6 @@ public class HammerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (inputProvider == null)
-        {
-            return;
-        }
-
         if (attackCooldownTimer > 0f)
         {
             attackCooldownTimer -= Time.fixedDeltaTime;
@@ -176,6 +198,41 @@ public class HammerController : MonoBehaviour
         return true;
     }
 
+    public void MoveFromButton(Vector3 movementInput, float deltaTime)
+    {
+        if (currentState != HammerState.Idle)
+        {
+            return;
+        }
+
+        ApplyMovement(movementInput, 0f, deltaTime);
+    }
+
+    public void SetButtonMovement(Object source, Vector3 movementInput)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        buttonMovementInputs[source] = movementInput;
+    }
+
+    /// <summary>
+    /// Registra um IHammerInputProvider externo (ex: botão da cabine).
+    /// Pode ser chamado a qualquer momento, inclusive depois do Start.
+    /// </summary>
+    public void RegisterInputProvider(IHammerInputProvider provider)
+    {
+        if (provider == null)
+            return;
+
+        if (!inputProviders.Contains(provider))
+        {
+            inputProviders.Add(provider);
+        }
+    }
+
     private void UpdateIdleRotation()
     {
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, idleRotationTarget, 0.15f));
@@ -205,34 +262,7 @@ public class HammerController : MonoBehaviour
 
     private void UpdateIdle()
     {
-        Vector3 movement = cachedMovementInput;
-
-        if (movement.sqrMagnitude > 1f)
-        {
-            movement.Normalize();
-        }
-
-        Vector3 currentPosition = rb.position;
-        Vector3 nextPosition = currentPosition +
-            new Vector3(movement.x, 0f, movement.z) * moveSpeed * Time.fixedDeltaTime;
-
-        nextPosition.y = Mathf.Clamp(
-            currentPosition.y + cachedHeightInput * verticalSpeed * Time.fixedDeltaTime,
-            minHeight,
-            maxHeight
-        );
-
-        if (limitX)
-        {
-            nextPosition.x = Mathf.Clamp(nextPosition.x, minX, maxX);
-        }
-
-        if (limitZ)
-        {
-            nextPosition.z = Mathf.Clamp(nextPosition.z, minZ, maxZ);
-        }
-
-        MoveToPosition(nextPosition);
+        ApplyMovement(cachedMovementInput, cachedHeightInput, Time.fixedDeltaTime);
 
         if (attackQueued)
         {
@@ -361,14 +391,14 @@ public class HammerController : MonoBehaviour
 
     private void ResolveInputProvider()
     {
-        inputProvider = null;
+        inputProviders.Clear();
 
-        if (inputProviderSource != null)
+        if (inputProviderSource is IHammerInputProvider explicitProvider)
         {
-            inputProvider = inputProviderSource as IHammerInputProvider;
+            inputProviders.Add(explicitProvider);
         }
 
-        if (inputProvider == null && autoFindProvider)
+        if (inputProviders.Count == 0 && autoFindProvider)
         {
             MonoBehaviour[] behaviours = GetComponents<MonoBehaviour>();
 
@@ -376,14 +406,12 @@ public class HammerController : MonoBehaviour
             {
                 if (behaviour is IHammerInputProvider provider)
                 {
-                    inputProviderSource = behaviour;
-                    inputProvider = provider;
-                    break;
+                    inputProviders.Add(provider);
                 }
             }
         }
 
-        if (inputProvider == null)
+        if (inputProviders.Count == 0)
         {
             Debug.LogError("HammerController requires a MonoBehaviour that implements IHammerInputProvider.", this);
             enabled = false;
@@ -393,5 +421,37 @@ public class HammerController : MonoBehaviour
     private void MoveToPosition(Vector3 position)
     {
         rb.MovePosition(position);
+    }
+
+    private void ApplyMovement(Vector3 movementInput, float heightInput, float deltaTime)
+    {
+        Vector3 movement = movementInput;
+
+        if (movement.sqrMagnitude > 1f)
+        {
+            movement.Normalize();
+        }
+
+        Vector3 currentPosition = rb.position;
+        Vector3 nextPosition = currentPosition +
+            new Vector3(movement.x, 0f, movement.z) * moveSpeed * deltaTime;
+
+        nextPosition.y = Mathf.Clamp(
+            currentPosition.y + Mathf.Clamp(heightInput, -1f, 1f) * verticalSpeed * deltaTime,
+            minHeight,
+            maxHeight
+        );
+
+        if (limitX)
+        {
+            nextPosition.x = Mathf.Clamp(nextPosition.x, minX, maxX);
+        }
+
+        if (limitZ)
+        {
+            nextPosition.z = Mathf.Clamp(nextPosition.z, minZ, maxZ);
+        }
+
+        MoveToPosition(nextPosition);
     }
 }
