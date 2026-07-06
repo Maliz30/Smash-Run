@@ -18,20 +18,14 @@ public class HammerController : MonoBehaviour
     [SerializeField] private MonoBehaviour inputProviderSource;
     [SerializeField] private bool autoFindProvider = true;
 
+    [Header("Shared Attack Area")]
+    [SerializeField] private GroundAreaFollow attackArea;
+    [SerializeField] private HammerAttackDispatcher attackDispatcher;
+
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float verticalSpeed = 3f;
     [SerializeField] private float minHeight = 1.5f;
     [SerializeField] private float maxHeight = 8f;
     [SerializeField] private float defaultHeight = 4f;
-
-    [Header("Boundaries")]
-    [SerializeField] private bool limitX = false;
-    [SerializeField] private float minX = -5f;
-    [SerializeField] private float maxX = 5f;
-    [SerializeField] private bool limitZ = false;
-    [SerializeField] private float minZ = -5f;
-    [SerializeField] private float maxZ = 5f;
 
     [Header("Swing Rotation")]
     [SerializeField] private Vector3 headLocalDirection = Vector3.forward;
@@ -56,13 +50,12 @@ public class HammerController : MonoBehaviour
     private Quaternion idleRotationTarget;
     private Quaternion windUpRotation;
     private Quaternion attackRotation;
-    private Vector3 cachedMovementInput;
-    private float cachedHeightInput;
-    private bool attackQueued;
     private bool hasAppliedDamageThisAttack;
     private float stateTimer;
     private float attackCooldownTimer;
-    private Vector3 attackStartPosition;
+    private Vector3 homePosition;
+    private Vector3 windUpStartPosition;
+    private Vector3 attackTargetPosition;
     private Vector3 recoverStartPosition;
     private Vector3 recoverTargetPosition;
     private Quaternion recoverStartRotation;
@@ -84,6 +77,7 @@ public class HammerController : MonoBehaviour
 
         Vector3 startPosition = transform.position;
         startPosition.y = Mathf.Clamp(defaultHeight, minHeight, maxHeight);
+        homePosition = startPosition;
         MoveToPosition(startPosition);
         rb.MoveRotation(initialRotation);
         currentState = HammerState.Idle;
@@ -115,13 +109,11 @@ public class HammerController : MonoBehaviour
     private void Update()
     {
         Vector3 providerMovementInput = Vector3.zero;
-        float providerHeightInput = 0f;
         bool attackTriggered = false;
 
         foreach (IHammerInputProvider inputProvider in inputProviders)
         {
             providerMovementInput += inputProvider.GetMovementInput();
-            providerHeightInput += inputProvider.GetHeightInput();
 
             if (inputProvider.GetAttackTrigger())
             {
@@ -144,12 +136,14 @@ public class HammerController : MonoBehaviour
             providerMovementInput.Normalize();
         }
 
-        cachedMovementInput = providerMovementInput;
-        cachedHeightInput = Mathf.Clamp(providerHeightInput, -1f, 1f);
-
-        if (attackTriggered)
+        if (attackArea != null)
         {
-            attackQueued = true;
+            attackArea.ApplyMovementInput(providerMovementInput, Time.deltaTime);
+        }
+
+        if (attackTriggered && attackDispatcher != null)
+        {
+            attackDispatcher.TriggerAttack();
         }
     }
 
@@ -164,7 +158,6 @@ public class HammerController : MonoBehaviour
         {
             case HammerState.Idle:
                 UpdateIdleRotation();
-                UpdateIdle();
                 break;
             case HammerState.WindingUp:
                 UpdateWindingUpRotation();
@@ -187,25 +180,16 @@ public class HammerController : MonoBehaviour
         ResolveInputProvider();
     }
 
-    public bool TryStartAttack()
+    public bool TryStartAttack(Vector3 targetPosition)
     {
         if (currentState != HammerState.Idle || attackCooldownTimer > 0f)
         {
             return false;
         }
 
+        attackTargetPosition = new Vector3(targetPosition.x, homePosition.y, targetPosition.z);
         TransitionTo(HammerState.WindingUp);
         return true;
-    }
-
-    public void MoveFromButton(Vector3 movementInput, float deltaTime)
-    {
-        if (currentState != HammerState.Idle)
-        {
-            return;
-        }
-
-        ApplyMovement(movementInput, 0f, deltaTime);
     }
 
     public void SetButtonMovement(Object source, Vector3 movementInput)
@@ -260,27 +244,17 @@ public class HammerController : MonoBehaviour
         rb.MoveRotation(Quaternion.Slerp(recoverStartRotation, recoverTargetRotation, easedT));
     }
 
-    private void UpdateIdle()
-    {
-        ApplyMovement(cachedMovementInput, cachedHeightInput, Time.fixedDeltaTime);
-
-        if (attackQueued)
-        {
-            attackQueued = false;
-            TryStartAttack();
-        }
-    }
-
     private void UpdateWindingUp()
     {
         stateTimer += Time.fixedDeltaTime;
 
         float duration = Mathf.Max(windUpDuration, 0.01f);
         float t = Mathf.Clamp01(stateTimer / duration);
-        Vector3 nextPosition = attackStartPosition;
+
+        Vector3 nextPosition = Vector3.Lerp(windUpStartPosition, attackTargetPosition, t);
         nextPosition.y = Mathf.Lerp(
-            attackStartPosition.y,
-            Mathf.Min(maxHeight, attackStartPosition.y + windUpHeight),
+            windUpStartPosition.y,
+            Mathf.Min(maxHeight, windUpStartPosition.y + windUpHeight),
             t
         );
 
@@ -336,7 +310,7 @@ public class HammerController : MonoBehaviour
         switch (newState)
         {
             case HammerState.WindingUp:
-                attackStartPosition = rb.position;
+                windUpStartPosition = homePosition;
                 hasAppliedDamageThisAttack = false;
                 break;
             case HammerState.Attacking:
@@ -345,13 +319,12 @@ public class HammerController : MonoBehaviour
             case HammerState.Recovering:
                 recoverStartPosition = rb.position;
                 recoverStartRotation = rb.rotation;
-                recoverTargetPosition = attackStartPosition;
-                recoverTargetPosition.y = Mathf.Clamp(attackStartPosition.y, minHeight, maxHeight);
+                recoverTargetPosition = homePosition;
+                recoverTargetPosition.y = Mathf.Clamp(homePosition.y, minHeight, maxHeight);
                 recoverTargetRotation = idleRotationTarget;
                 break;
             case HammerState.Idle:
                 attackCooldownTimer = attackCooldown;
-                attackQueued = false;
                 break;
         }
     }
@@ -379,7 +352,7 @@ public class HammerController : MonoBehaviour
         }
         Debug.Log("Player entrou na área do martelo!");
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-        
+
         if (playerHealth != null)
         {
             playerHealth.TakeDamage(1); // Manda o sinal para o Player tirar vida e tocar o áudio
@@ -421,37 +394,5 @@ public class HammerController : MonoBehaviour
     private void MoveToPosition(Vector3 position)
     {
         rb.MovePosition(position);
-    }
-
-    private void ApplyMovement(Vector3 movementInput, float heightInput, float deltaTime)
-    {
-        Vector3 movement = movementInput;
-
-        if (movement.sqrMagnitude > 1f)
-        {
-            movement.Normalize();
-        }
-
-        Vector3 currentPosition = rb.position;
-        Vector3 nextPosition = currentPosition +
-            new Vector3(movement.x, 0f, movement.z) * moveSpeed * deltaTime;
-
-        nextPosition.y = Mathf.Clamp(
-            currentPosition.y + Mathf.Clamp(heightInput, -1f, 1f) * verticalSpeed * deltaTime,
-            minHeight,
-            maxHeight
-        );
-
-        if (limitX)
-        {
-            nextPosition.x = Mathf.Clamp(nextPosition.x, minX, maxX);
-        }
-
-        if (limitZ)
-        {
-            nextPosition.z = Mathf.Clamp(nextPosition.z, minZ, maxZ);
-        }
-
-        MoveToPosition(nextPosition);
     }
 }
