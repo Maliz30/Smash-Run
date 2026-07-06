@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
@@ -48,6 +49,10 @@ public class HammerController : MonoBehaviour
     [SerializeField] private float groundY = 0f;
     [SerializeField] private int attackDamage = 20;
     [SerializeField] private LayerMask damageLayer = -1;
+
+    [Header("UI")] 
+    [Tooltip("Imagem da barra de recarga no Canvas (Image Type: Filled)")]
+    [SerializeField] private Image cooldownBarImage;
 
     private Rigidbody rb;
     private readonly List<IHammerInputProvider> inputProviders = new();
@@ -151,6 +156,8 @@ public class HammerController : MonoBehaviour
         {
             attackQueued = true;
         }
+
+        UpdateCooldownUI();
     }
 
     private void FixedUpdate()
@@ -387,6 +394,20 @@ public class HammerController : MonoBehaviour
         // TODO: apply damage via PlayerHealth when that system is ready.
         hasAppliedDamageThisAttack = true;
         TransitionTo(HammerState.Recovering);
+    }
+
+    private void UpdateCooldownUI()
+    {
+        if (cooldownBarImage == null) return;
+
+        if (attackCooldownTimer > 0f)
+        {
+            cooldownBarImage.fillAmount = 1f - (attackCooldownTimer / attackCooldown);
+        }
+        else
+        {
+            cooldownBarImage.fillAmount = 1f;
+        }
     }
 
     private void ResolveInputProvider()
