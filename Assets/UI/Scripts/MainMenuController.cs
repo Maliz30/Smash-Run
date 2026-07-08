@@ -4,15 +4,22 @@ using UnityEngine.SceneManagement;
 public class MainMenuController : MonoBehaviour
 {
     [Header("Configurações de Transição")]
-    [Tooltip("Nome exato da cena de Loading")]
-    [SerializeField] private string loadingSceneName = "LoadingScene";
+    [Tooltip("Nome exato da cena de Loading no Build Profiles")]
+    [SerializeField] private string loadingSceneName = "TelaLoading"; // Certifique-se de que o nome está igual ao da sua cena
+    
+    [Tooltip("Nome exato da cena dos quadrinhos/história")]
+    [SerializeField] private string cenaDestinoName = "CenaHistoria"; // Adicionamos esse campo para a história
 
     /// <summary>
     /// Acionado pelo botão principal "Iniciar".
     /// </summary>
     public void OnPlayButtonClicked()
     {
-        Debug.Log("[MainMenuController] Iniciando transição para LoadingScene...");
+        Debug.Log("[MainMenuController] Salvando a cena de destino e indo para o Loading...");
+        
+        // SALVA NA MEMÓRIA: Avisa para a tela de loading que ela deve carregar a história depois
+        PlayerPrefs.SetString("CenaParaCarregar", cenaDestinoName);
+        
         SceneManager.LoadScene(loadingSceneName);
     }
 
