@@ -72,8 +72,12 @@ public class PhysicsMovement : MonoBehaviour
         {
             moveDirection.Normalize();
             rb.AddForce(moveDirection * moveSpeed, ForceMode.Acceleration);
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
+            // ------------------------------------
         }
 
+        
         Vector3 horizontalVelocity = new Vector3(
             rb.linearVelocity.x,
             0f,
@@ -112,6 +116,7 @@ public class PhysicsMovement : MonoBehaviour
                 currentVel.z
             );
         }
+        
     }
 
     private void TryJump()
