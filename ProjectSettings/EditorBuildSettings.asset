@@ -11,12 +11,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MenuScene.unity
     guid: 8ca22c840d1dc5e49bf12569150880e7
+  - enabled: 0
+    path: Assets/Scenes/LoadingScene.unity
+    guid: 8cbb35048e7aed94fb8dd7a97a81400c
   - enabled: 1
     path: Assets/Scenes/CenaMenu.unity
     guid: c62b15db615d2af4582401d852abccab
   - enabled: 1
-    path: Assets/Scenes/LoadingScene.unity
-    guid: 8cbb35048e7aed94fb8dd7a97a81400c
+    path: Assets/Scenes/CenaCarregamento.unity
+    guid: d720972bf18bde54dba4a76e3c5800b8
   - enabled: 1
     path: Assets/Scenes/CenaHistoria.unity
     guid: 6ce95b57b58326140acad2711f29bfde

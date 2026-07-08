@@ -530,7 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b440df7f81b1d9e4c9982b77e7cbc29c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoadingManager
-  mainSceneName: CenaPrincipal
+  mainSceneName: CenaHistoria
   progressBarFill: {fileID: 0}
   progressText: {fileID: 0}
 --- !u!4 &1375086354
