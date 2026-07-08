@@ -65,6 +65,7 @@ public class PhysicsMovement : MonoBehaviour
     private void MoveCube()
     {
         Vector2 input = inputHandler.MovementInput;
+        GetComponentInChildren<Animator>().SetBool("isMoving", input.sqrMagnitude > 0.01f);
         Vector3 moveDirection = new Vector3(input.x, 0f, input.y);
 
         if (moveDirection.sqrMagnitude > 0.01f)
