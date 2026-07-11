@@ -1,139 +1,34 @@
-// using System.Collections;
-// using UnityEngine;
-// using Unity.Cinemachine; // Namespace obrigatório para o Cinemachine da Unity 6
-// using UnityEngine.SceneManagement;
-
-// public class CutsceneManager : MonoBehaviour
-// {
-//     [Header("Câmeras dos Quadrinhos")]
-//     [SerializeField] private CinemachineCamera[] camerasDosQuadros; // Arraste as 4 câmeras na ordem (0 a 3)
-//     [SerializeField] private float tempoEmCadaQuadro = 3.5f; // Quanto tempo a câmera fica parada em cada quadrinho
-
-//     [Header("Configurações de Áudio")]
-//     [SerializeField] private AudioSource somNarracao; // O AudioSource do seu gerenciador
-//     [SerializeField] private AudioClip audioAlegre;  // Waltz of the Carnies
-//     [SerializeField] private AudioClip audioShockTransicao; // shock-funny-version
-//     [SerializeField] private AudioClip audioTenso;   // Circus of Freaks
-
-//     private int quadroAtual = 0;
-//     private Coroutine cutsceneCoroutine;
-
-//     void Start()
-//     {
-//         // Garante que apenas a primeira câmera está ativa no início
-//         VisualizarQuadro(0);
-
-//         // Inicia a música alegre em Loop
-//         if (somNarracao != null && audioAlegre != null)
-//         {
-//             somNarracao.clip = audioAlegre;
-//             somNarracao.loop = true;
-//             somNarracao.Play();
-//         }
-
-//         cutsceneCoroutine = StartCoroutine(ExecutarSequenciaHQ());
-//     }
-
-//     IEnumerator ExecutarSequenciaHQ()
-//     {
-//         // --- QUADRO 1 ---
-//         yield return new WaitForSeconds(tempoEmCadaQuadro);
-        
-//         // --- QUADRO 2 ---
-//         quadroAtual = 1;
-//         VisualizarQuadro(quadroAtual);
-//         yield return new WaitForSeconds(tempoEmCadaQuadro);
-        
-//         // --- QUADRO 3 (A transição acontece aqui - Ajustado para estender a música alegre e reduzir o choque) ---
-//         quadroAtual = 2;
-//         VisualizarQuadro(quadroAtual);
-
-//         // 1. Deixa a música alegre (Waltz of the Carnies) tocando por mais 2 segundos dentro deste quadro
-//         yield return new WaitForSeconds(2.0f);
-
-//         // 2. AGORA SIM: Interrompe a música alegre e toca o efeito de choque cômico
-//         if (somNarracao != null && audioShockTransicao != null)
-//         {
-//             somNarracao.Stop();
-//             somNarracao.loop = false;
-//             somNarracao.PlayOneShot(audioShockTransicao);
-//         }
-
-//         // 3. Espera apenas 1 segundo (os 3 segundos originais menos os 2 que demos para a música alegre)
-//         yield return new WaitForSeconds(1.0f);
-
-//         // 4. Entra imediatamente a música tensa do robô (Circus of Freaks) em loop
-//         if (somNarracao != null)
-//         {
-//             somNarracao.Stop(); 
-//         }
-
-//         // 5. Espera o 1 segundo restante para fechar os 4 segundos totais do Quadro 3
-//         // (2.0s alegre + 1.0s choque + 1.0s tenso = 4.0s)
-//         float tempoRestanteQuadro3 = Mathf.Max(0.1f, tempoEmCadaQuadro - 3.0f); 
-//         yield return new WaitForSeconds(tempoRestanteQuadro3);
-
-//         // --- QUADRO 4 ---
-//         quadroAtual = 3;
-//         VisualizarQuadro(quadroAtual);
-//         // A música tensa continua tocando de fundo aqui!
-//         yield return new WaitForSeconds(tempoEmCadaQuadro);
-
-//         // Fim da HQ -> Avança para a tela de instruções de controles (Semana 6 do SGDD)
-//         CarregarProximaCena();
-//     }
-
-//     void VisualizarQuadro(int indice)
-//     {
-//         for (int i = 0; i < camerasDosQuadros.Length; i++)
-//         {
-//             if (camerasDosQuadros[i] != null)
-//             {
-//                 camerasDosQuadros[i].gameObject.SetActive(i == indice);
-//             }
-//         }
-//     }
-
-//     void Update()
-//     {
-//         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-//         {
-//             CarregarProximaCena();
-//         }
-//     }
-
-//     void CarregarProximaCena()
-//     {
-//         SceneManager.LoadScene("TelaInstrucoes"); 
-//     }
-// }
-
 using System.Collections;
 using UnityEngine;
-using Unity.Cinemachine; // Namespace obrigatório para o Cinemachine da Unity 6
+using Unity.Cinemachine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI; // Obrigatório para controlar o Botão
 
 public class CutsceneManager : MonoBehaviour
 {
     [Header("Câmeras dos Quadrinhos")]
-    [SerializeField] private CinemachineCamera[] camerasDosQuadros; // Arraste as 4 câmeras na ordem (0 a 3)
-    [SerializeField] private float tempoEmCadaQuadro = 3.5f; // Quanto tempo a câmera fica parada em cada quadrinho
+    [SerializeField] private CinemachineCamera[] camerasDosQuadros; // Arraste as 4 câmeras individuais (0 a 3)
+    [SerializeField] private CinemachineCamera cameraGeral; // Arraste a 5ª câmera (Visão Geral) aqui
+    [SerializeField] private float tempoEmCadaQuadro = 4.0f; 
 
     [Header("Configurações de Áudio")]
-    [SerializeField] private AudioSource somNarracao; // O AudioSource do seu gerenciador
-    [SerializeField] private AudioClip audioAlegre;  // Waltz of the Carnies
-    [SerializeField] private AudioClip audioShockTransicao; // shock-funny-version
-    [SerializeField] private AudioClip audioTenso;   // Circus of Freaks
+    [SerializeField] private AudioSource somNarracao; 
+    [SerializeField] private AudioClip audioAlegre;  
+    [SerializeField] private AudioClip audioShockTransicao; 
+    [SerializeField] private AudioClip audioTenso;   
+
+    [Header("Interface de Fim da Cutscene")]
+    [SerializeField] private GameObject botaoIniciarJogo; // Arraste o botão que criamos aqui
 
     private int quadroAtual = 0;
-    private Coroutine cutsceneCoroutine;
+    private bool cutsceneFinalizada = false;
 
     void Start()
     {
-        // Garante que apenas a primeira câmera está ativa no início
+        if (botaoIniciarJogo != null) botaoIniciarJogo.SetActive(false); // Garante que o botão começa escondido
+        
         VisualizarQuadro(0);
 
-        // Inicia a música alegre em Loop
         if (somNarracao != null && audioAlegre != null)
         {
             somNarracao.clip = audioAlegre;
@@ -141,7 +36,7 @@ public class CutsceneManager : MonoBehaviour
             somNarracao.Play();
         }
 
-        cutsceneCoroutine = StartCoroutine(ExecutarSequenciaHQ());
+        StartCoroutine(ExecutarSequenciaHQ());
     }
 
     IEnumerator ExecutarSequenciaHQ()
@@ -154,73 +49,78 @@ public class CutsceneManager : MonoBehaviour
         VisualizarQuadro(quadroAtual);
         yield return new WaitForSeconds(tempoEmCadaQuadro);
         
-        // --- QUADRO 3 (A transição acontece aqui) ---
+        // --- QUADRO 3 ---
         quadroAtual = 2;
         VisualizarQuadro(quadroAtual);
-
-        // 1. Deixa a música alegre (Waltz of the Carnies) tocando por mais 2 segundos dentro deste quadro
         yield return new WaitForSeconds(2.0f);
 
-        // 2. Interrompe a música alegre e toca o efeito de choque cômico
         if (somNarracao != null && audioShockTransicao != null)
         {
             somNarracao.Stop();
             somNarracao.loop = false;
             somNarracao.PlayOneShot(audioShockTransicao);
         }
+        
+        // ALTERAÇÃO AQUI: Mudado de 1.0f para 2.0f para o efeito sonoro de choque durar mais
+        yield return new WaitForSeconds(2.0f);
 
-        // 3. Espera exatamente 1 segundo com o choque cômico rodando sozinho
-        yield return new WaitForSeconds(1.0f);
+        if (somNarracao != null) somNarracao.Stop(); 
 
-        // 4. CORREÇÃO: Garante a interrupção forçada do áudio de choque antes de entrar a música tensa
-        if (somNarracao != null)
-        {
-            somNarracao.Stop(); 
-        }
-
-        // 5. Entra imediatamente a música tensa do robô (Circus of Freaks) em loop limpo
         if (somNarracao != null && audioTenso != null)
         {
             somNarracao.clip = audioTenso;
             somNarracao.loop = true;
             somNarracao.Play();
         }
-
-        // 6. Espera o 1 segundo restante para fechar os 4 segundos totais do Quadro 3
-        float tempoRestanteQuadro3 = Mathf.Max(0.1f, tempoEmCadaQuadro - 3.0f); 
-        yield return new WaitForSeconds(tempoRestanteQuadro3);
+        yield return new WaitForSeconds(1.0f);
 
         // --- QUADRO 4 ---
         quadroAtual = 3;
         VisualizarQuadro(quadroAtual);
-        // Agora a música tensa continua tocando de fundo de forma 100% limpa, sem o choque atrapalhando!
         yield return new WaitForSeconds(tempoEmCadaQuadro);
 
-        // Fim da HQ -> Avança para a tela de instruções de controles
-        CarregarProximaCena();
+        // --- EFEITO ZOOM OUT (MOSTRAR TUDO) ---
+        Debug.Log("[Cutscene] Tirando o zoom e mostrando todos os quadrinhos.");
+        cutsceneFinalizada = true;
+        
+        // Desativa as prioridades das outras e ativa a câmera geral
+        DesativarTodasAsCameras();
+        if (cameraGeral != null) cameraGeral.Priority = 15;
+
+        // Espera a câmera terminar de deslizar para trás antes de mostrar o botão (da um efeito lindo!)
+        yield return new WaitForSeconds(1.2f);
+
+        // Exibe o botão na tela para os jogadores iniciarem a partida
+        if (botaoIniciarJogo != null)
+        {
+            botaoIniciarJogo.SetActive(true);
+        }
     }
 
     void VisualizarQuadro(int indice)
     {
+        DesativarTodasAsCameras();
+        if (camerasDosQuadros[indice] != null)
+        {
+            camerasDosQuadros[indice].Priority = 10;
+        }
+    }
+
+    void DesativarTodasAsCameras()
+    {
         for (int i = 0; i < camerasDosQuadros.Length; i++)
         {
-            if (camerasDosQuadros[i] != null)
-            {
-                camerasDosQuadros[i].gameObject.SetActive(i == indice);
-            }
+            if (camerasDosQuadros[i] != null) camerasDosQuadros[i].Priority = 5;
         }
+        if (cameraGeral != null) cameraGeral.Priority = 5;
     }
 
-    void Update()
+    // Função que será vinculada ao OnClick() do novo botão de Iniciar Jogo
+    public void AvançarParaCenaPrincipal()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-        {
-            CarregarProximaCena();
-        }
-    }
+        Debug.Log("[Cutscene] Botão clicado! Salvando destino e indo para a tela de carregamento...");
 
-    void CarregarProximaCena()
-    {
-        SceneManager.LoadScene("TelaInstrucoes"); 
+        PlayerPrefs.SetString("CenaParaCarregar", "CenaPrincipal");
+        SceneManager.LoadScene("cenaCarregamento");
     }
 }
