@@ -4,9 +4,9 @@ using UnityEngine;
 public class PressButton : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private HammerController hammerController;
+    [SerializeField] private HammerAttackDispatcher attackDispatcher;
     [SerializeField] private Transform plunger;
-    [SerializeField] private bool autoFindHammer = true;
+    [SerializeField] private bool autoFindDispatcher = true;
     [SerializeField] private bool autoCaptureRestPos = true;
 
     [Header("Press")]
@@ -19,9 +19,9 @@ public class PressButton : MonoBehaviour
 
     private void Start()
     {
-        if (autoFindHammer && hammerController == null)
+        if (autoFindDispatcher && attackDispatcher == null)
         {
-            hammerController = FindAnyObjectByType<HammerController>();
+            attackDispatcher = FindAnyObjectByType<HammerAttackDispatcher>();
         }
 
         if (autoCaptureRestPos && plunger != null)
@@ -32,7 +32,7 @@ public class PressButton : MonoBehaviour
 
     private void Update()
     {
-        if (plunger == null || hammerController == null)
+        if (plunger == null || attackDispatcher == null)
         {
             return;
         }
@@ -48,7 +48,7 @@ public class PressButton : MonoBehaviour
 
         if (isPressed && !wasPressedLastFrame && cooldownTimer <= 0f)
         {
-            if (hammerController.TryStartAttack())
+            if (attackDispatcher.TriggerAttack())
             {
                 cooldownTimer = cooldown;
             }
