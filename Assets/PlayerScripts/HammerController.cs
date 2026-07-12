@@ -18,6 +18,9 @@ public class HammerController : MonoBehaviour
     [SerializeField] private MonoBehaviour inputProviderSource;
     [SerializeField] private bool autoFindProvider = true;
 
+    [Header("Visual")]
+    [SerializeField] private Animator robotAnimator;
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float verticalSpeed = 3f;
@@ -192,6 +195,11 @@ public class HammerController : MonoBehaviour
         if (currentState != HammerState.Idle || attackCooldownTimer > 0f)
         {
             return false;
+        }
+
+        if (robotAnimator != null)
+        {
+            robotAnimator.SetTrigger("Bash");
         }
 
         TransitionTo(HammerState.WindingUp);
