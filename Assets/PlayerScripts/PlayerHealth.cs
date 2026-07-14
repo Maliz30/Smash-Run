@@ -1,5 +1,7 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -53,11 +55,19 @@ public class PlayerHealth : MonoBehaviour
     }
 
     private void Die()
+{
+    if (textoVidas != null)
     {
-        if (textoVidas != null)
-        {
-            textoVidas.text = "GAME OVER!";
-        }
-        Debug.Log("Você Perdeu!");
+        textoVidas.text = "GAME OVER!";
     }
+    Debug.Log("Você Perdeu! Reiniciando em 3 segundos...");
+    
+    StartCoroutine(RestartGameRoutine());
+}
+
+    private IEnumerator RestartGameRoutine()
+{
+    yield return new WaitForSeconds(3f);
+    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+}
 }
