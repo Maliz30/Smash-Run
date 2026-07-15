@@ -1,9 +1,11 @@
 using UnityEngine;
 using TMPro;
+
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.UI; // NECESSÁRIO PARA O IMAGE
 using System.Collections.Generic; // NECESSÁRIO PARA A LISTA
+
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -33,7 +35,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (vidasRestantes <= 0) return;
+        if (vidasRestantes <= 0 || GameFlowManager.IsMatchEnding) return;
 
         vidasRestantes -= 1; 
         AtualizarInterface();
@@ -66,19 +68,13 @@ public class PlayerHealth : MonoBehaviour
     }
 
     private void Die()
-{
-    if (textoVidas != null)
     {
-        textoVidas.text = "GAME OVER!";
-    }
-    Debug.Log("Você Perdeu! Reiniciando em 3 segundos...");
-    
-    StartCoroutine(RestartGameRoutine());
-}
+        if (textoVidas != null)
+        {
+            textoVidas.text = "GAME OVER!";
+        }
 
-    private IEnumerator RestartGameRoutine()
-{
-    yield return new WaitForSeconds(3f);
-    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-}
+        Debug.Log("Você Perdeu! Indo para a tela de Game Over...");
+        GameFlowManager.RequestGameOver();
+    }
 }

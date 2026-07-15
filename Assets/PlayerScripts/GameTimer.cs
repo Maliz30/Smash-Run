@@ -20,7 +20,7 @@ public class GameTimer : MonoBehaviour
 
     private void Update()
     {
-        if (partidaEncerrada) return;
+        if (partidaEncerrada || GameFlowManager.IsMatchEnding) return;
 
         tempoRestante -= Time.deltaTime;
 
@@ -29,6 +29,7 @@ public class GameTimer : MonoBehaviour
             tempoRestante = 0;
             partidaEncerrada = true;
             Debug.Log("Tempo esgotado!");
+            GameFlowManager.RequestGameOver();
         }
 
         AtualizarTextoInterface();
