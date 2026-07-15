@@ -972,6 +972,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDashCharges
   maxCharges: 3
+  textoDashes: {fileID: 0}
 --- !u!114 &1639791488936186748
 MonoBehaviour:
   m_ObjectHideFlags: 0

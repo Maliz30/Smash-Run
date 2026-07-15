@@ -56,7 +56,7 @@ public class PlayerHealth : MonoBehaviour
     private void AtualizarInterface()
     {
         // Atualiza o texto
-        if (textoVidas != null) textoVidas.text = "Vidas: " + vidasRestantes;
+        if (textoVidas != null) textoVidas.text = $"VIDAS: {vidasRestantes}";
         
         // Atualiza a imagem (se a lista não estiver vazia)
         if (imagemStatus != null && spritesDano.Count > 0)

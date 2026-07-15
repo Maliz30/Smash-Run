@@ -39,7 +39,7 @@ public class GameTimer : MonoBehaviour
     {
         int minutos = Mathf.FloorToInt(tempoRestante / 60);
         int segundos = Mathf.FloorToInt(tempoRestante % 60);
-        string texto = string.Format("{0:00}:{1:00}", minutos, segundos);
+        string texto = $"TEMPO: {minutos:00}:{segundos:00}";
 
         if (textoTempoTela != null) textoTempoTela.text = texto;
         if (textoTempoVR != null) textoTempoVR.text = texto;
