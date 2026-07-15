@@ -65,14 +65,19 @@ public class PhysicsMovement : MonoBehaviour
     private void MoveCube()
     {
         Vector2 input = inputHandler.MovementInput;
+        GetComponentInChildren<Animator>().SetBool("isMoving", input.sqrMagnitude > 0.01f);
         Vector3 moveDirection = new Vector3(input.x, 0f, input.y);
 
         if (moveDirection.sqrMagnitude > 0.01f)
         {
             moveDirection.Normalize();
             rb.AddForce(moveDirection * moveSpeed, ForceMode.Acceleration);
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
+            // ------------------------------------
         }
 
+        
         Vector3 horizontalVelocity = new Vector3(
             rb.linearVelocity.x,
             0f,
@@ -111,6 +116,7 @@ public class PhysicsMovement : MonoBehaviour
                 currentVel.z
             );
         }
+        
     }
 
     private void TryJump()

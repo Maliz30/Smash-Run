@@ -5,18 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/CenaMenu.unity
+    guid: c62b15db615d2af4582401d852abccab
+  - enabled: 1
+    path: Assets/Scenes/CenaCarregamento.unity
+    guid: d720972bf18bde54dba4a76e3c5800b8
+  - enabled: 1
+    path: Assets/Scenes/CenaHistoria.unity
+    guid: 6ce95b57b58326140acad2711f29bfde
   - enabled: 1
     path: Assets/Scenes/CenaPrincipal.unity
     guid: 53b49078dd0a6c4a2a4428ced018ead0
-  - enabled: 1
-    path: Assets/Scenes/LoadingScene.unity
-    guid: 8cbb35048e7aed94fb8dd7a97a81400c
-  - enabled: 1
-    path: Assets/Scenes/MenuScene.unity
-    guid: 8ca22c840d1dc5e49bf12569150880e7
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: cab5d800cffded94c97681209aba4137, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 80e9aa91b0c434042a00d3200bd96bb4, type: 2}

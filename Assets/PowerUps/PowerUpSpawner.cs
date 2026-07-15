@@ -8,7 +8,7 @@ public class PowerUpSpawner : MonoBehaviour
     [SerializeField] private Vector3 spawnAreaMin = new Vector3(-10f, 1f, -10f);
     [SerializeField] private Vector3 spawnAreaMax = new Vector3(10f, 1f, 10f);
 
-    private GameObject activePowerUp;
+    private static GameObject activePowerUp;
     private float timer;
 
     private void Start()
