@@ -3,7 +3,12 @@ guid: b5875180782ac984a9546b3303c514c4
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mdl_39_Mtl_m_fg_candy
+    second: {fileID: 2100000, guid: a27ea3afd54a3d14c97d2cf7913b5e8d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

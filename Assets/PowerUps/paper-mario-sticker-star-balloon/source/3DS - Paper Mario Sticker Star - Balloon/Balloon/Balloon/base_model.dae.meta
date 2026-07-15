@@ -3,7 +3,17 @@ guid: 7ec717dd5c418af478a7efb8148c82cf
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mBalloon_knot_mat
+    second: {fileID: 2100000, guid: b203d7da02da140449ee5281d7580363, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mBalloon_mat
+    second: {fileID: 2100000, guid: 451d2e20b3d2c504dbe2ef9b7bcd42d0, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
