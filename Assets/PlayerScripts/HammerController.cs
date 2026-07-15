@@ -43,6 +43,10 @@ public class HammerController : MonoBehaviour
     [SerializeField] private int attackDamage = 20;
     [SerializeField] private LayerMask damageLayer = -1;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource hammerAudioSource;
+    [SerializeField] private AudioClip hitSound;
+
     private Rigidbody rb;
     private readonly List<IHammerInputProvider> inputProviders = new();
     private readonly Dictionary<Object, Vector3> buttonMovementInputs = new();
@@ -355,6 +359,8 @@ public class HammerController : MonoBehaviour
 
         if (playerHealth != null)
         {
+            if (hammerAudioSource != null && hitSound != null) 
+                hammerAudioSource.PlayOneShot(hitSound);
             playerHealth.TakeDamage(1); // Manda o sinal para o Player tirar vida e tocar o áudio
         }
         // TODO: apply damage via PlayerHealth when that system is ready.

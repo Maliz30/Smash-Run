@@ -19,6 +19,10 @@ public class PhysicsMovement : MonoBehaviour
     [SerializeField] private float dashSpeed = 3200f;
     [SerializeField] private float dashDuration = 0.15f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip dashSound;
+
     private Rigidbody rb;
     private Collider col;
     private PlayerInputHandler inputHandler;
@@ -74,7 +78,7 @@ public class PhysicsMovement : MonoBehaviour
             rb.AddForce(moveDirection * moveSpeed, ForceMode.Acceleration);
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
-            // ------------------------------------
+            
         }
 
         
@@ -144,6 +148,8 @@ public class PhysicsMovement : MonoBehaviour
             return;
         }
 
+        if (audioSource != null && dashSound != null) audioSource.PlayOneShot(dashSound);
+        
         dashDirection = GetDashDirection();
         dashTimeRemaining = dashDuration;
     }

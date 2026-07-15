@@ -8,6 +8,9 @@ public class InkPickup : MonoBehaviour
     [SerializeField] private VRVisionBlocker visionBlocker;
     [SerializeField] private bool autoFindVisionBlocker = true;
 
+    [SerializeField] private AudioSource audioSource; 
+    [SerializeField] private AudioClip inkSound;
+
     private void Start()
     {
         if (autoFindVisionBlocker && visionBlocker == null)
@@ -35,6 +38,8 @@ public class InkPickup : MonoBehaviour
             return;
         }
 
+        if (audioSource != null && inkSound != null) audioSource.PlayOneShot(inkSound);
+        
         visionBlocker.Block(blindDuration);
         gameObject.SetActive(false);
     }
