@@ -2,13 +2,13 @@ using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // Obrigatório para controlar o Botão
+using UnityEngine.UI; 
 
 public class CutsceneManager : MonoBehaviour
 {
     [Header("Câmeras dos Quadrinhos")]
-    [SerializeField] private CinemachineCamera[] camerasDosQuadros; // Arraste as 4 câmeras individuais (0 a 3)
-    [SerializeField] private CinemachineCamera cameraGeral; // Arraste a 5ª câmera (Visão Geral) aqui
+    [SerializeField] private CinemachineCamera[] camerasDosQuadros; 
+    [SerializeField] private CinemachineCamera cameraGeral; 
     [SerializeField] private float tempoEmCadaQuadro = 4.0f; 
 
     [Header("Configurações de Áudio")]
@@ -18,14 +18,18 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] private AudioClip audioTenso;   
 
     [Header("Interface de Fim da Cutscene")]
-    [SerializeField] private GameObject botaoIniciarJogo; // Arraste o botão que criamos aqui
+    [SerializeField] private GameObject botaoIniciarJogo; 
 
     private int quadroAtual = 0;
     private bool cutsceneFinalizada = false;
 
     void Start()
     {
-        if (botaoIniciarJogo != null) botaoIniciarJogo.SetActive(false); // Garante que o botão começa escondido
+        // CORREÇÃO: Força o botão a iniciar ATIVO e visível desde o segundo zero
+        if (botaoIniciarJogo != null) 
+        {
+            botaoIniciarJogo.SetActive(true); 
+        }
         
         VisualizarQuadro(0);
 
@@ -61,7 +65,6 @@ public class CutsceneManager : MonoBehaviour
             somNarracao.PlayOneShot(audioShockTransicao);
         }
         
-        // ALTERAÇÃO AQUI: Mudado de 1.0f para 2.0f para o efeito sonoro de choque durar mais
         yield return new WaitForSeconds(2.0f);
 
         if (somNarracao != null) somNarracao.Stop(); 
@@ -83,14 +86,12 @@ public class CutsceneManager : MonoBehaviour
         Debug.Log("[Cutscene] Tirando o zoom e mostrando todos os quadrinhos.");
         cutsceneFinalizada = true;
         
-        // Desativa as prioridades das outras e ativa a câmera geral
         DesativarTodasAsCameras();
         if (cameraGeral != null) cameraGeral.Priority = 15;
 
-        // Espera a câmera terminar de deslizar para trás antes de mostrar o botão (da um efeito lindo!)
         yield return new WaitForSeconds(1.2f);
 
-        // Exibe o botão na tela para os jogadores iniciarem a partida
+        // O botão permanece ativo aqui também como garantia final
         if (botaoIniciarJogo != null)
         {
             botaoIniciarJogo.SetActive(true);
@@ -115,12 +116,12 @@ public class CutsceneManager : MonoBehaviour
         if (cameraGeral != null) cameraGeral.Priority = 5;
     }
 
-    // Função que será vinculada ao OnClick() do novo botão de Iniciar Jogo
     public void AvançarParaCenaPrincipal()
     {
         Debug.Log("[Cutscene] Botão clicado! Salvando destino e indo para a tela de carregamento...");
 
         PlayerPrefs.SetString("CenaParaCarregar", "CenaPrincipal");
-        SceneManager.LoadScene("cenaCarregamento");
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("CenaCarregamento");
     }
 }
