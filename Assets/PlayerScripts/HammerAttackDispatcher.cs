@@ -22,6 +22,11 @@ public class HammerAttackDispatcher : MonoBehaviour
 
         HammerController hammer = attackArea.position.x < centerX ? leftHammer : rightHammer;
 
-        return hammer != null && hammer.TryStartAttack(attackArea.position);
+        if (hammer != null && hammer.TryStartAttack(attackArea.position))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

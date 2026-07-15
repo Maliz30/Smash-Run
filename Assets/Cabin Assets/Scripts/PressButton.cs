@@ -1,17 +1,19 @@
 using UnityEngine;
+using UnityEngine.UI; 
 
 [DisallowMultipleComponent]
 public class PressButton : MonoBehaviour
 {
-    [Header("References")]
+
     [SerializeField] private HammerAttackDispatcher attackDispatcher;
     [SerializeField] private Transform plunger;
     [SerializeField] private bool autoFindDispatcher = true;
     [SerializeField] private bool autoCaptureRestPos = true;
 
-    [Header("Press")]
+    [SerializeField] private Image barraDeCooldown;
+
     [SerializeField] private float pressThreshold = 0.15f;
-    [SerializeField] private float cooldown = 0.5f;
+    [SerializeField] private float cooldown = 4.5f; 
     [SerializeField] private Vector3 plungerRestLocalPos = Vector3.zero;
 
     private float cooldownTimer;
@@ -40,6 +42,18 @@ public class PressButton : MonoBehaviour
         if (cooldownTimer > 0f)
         {
             cooldownTimer -= Time.deltaTime;
+            
+            if (barraDeCooldown != null)
+            {
+                barraDeCooldown.fillAmount = 1f - (cooldownTimer / cooldown);
+            }
+        }
+        else
+        {
+            if (barraDeCooldown != null)
+            {
+                barraDeCooldown.fillAmount = 1f;
+            }
         }
 
         Vector3 restWorldPosition = GetRestWorldPosition();
@@ -51,6 +65,7 @@ public class PressButton : MonoBehaviour
             if (attackDispatcher.TriggerAttack())
             {
                 cooldownTimer = cooldown;
+                if (barraDeCooldown != null) barraDeCooldown.fillAmount = 0f;
             }
         }
 
@@ -62,24 +77,15 @@ public class PressButton : MonoBehaviour
         pressThreshold = Mathf.Max(0.001f, pressThreshold);
         cooldown = Mathf.Max(0f, cooldown);
 
-        if (plunger == null)
-        {
-            return;
-        }
+        if (plunger == null) return;
 
         MockPoseDriver mockPoseDriver = plunger.GetComponent<MockPoseDriver>();
-
         if (mockPoseDriver != null)
         {
-            // Keep the threshold below the plunger travel so the button can actually fire.
             float mockDepth = mockPoseDriver.PressDepth;
-
             if (mockDepth > 0f && pressThreshold >= mockDepth)
             {
-                Debug.LogWarning(
-                    "PressButton pressThreshold should be smaller than MockPoseDriver pressDepth.",
-                    this
-                );
+                Debug.LogWarning("PressButton pressThreshold should be smaller than MockPoseDriver pressDepth.", this);
             }
         }
     }
@@ -87,12 +93,7 @@ public class PressButton : MonoBehaviour
     private Vector3 GetRestWorldPosition()
     {
         Transform referenceSpace = plunger.parent;
-
-        if (referenceSpace == null)
-        {
-            return plungerRestLocalPos;
-        }
-
+        if (referenceSpace == null) return plungerRestLocalPos;
         return referenceSpace.TransformPoint(plungerRestLocalPos);
     }
 }
